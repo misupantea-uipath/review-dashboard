@@ -3,7 +3,13 @@ import { AfterViewInit, Injectable } from '@angular/core';
 import { ApolloError } from '@apollo/client/core';
 import { Apollo, QueryRef, gql } from 'apollo-angular';
 import { EmptyObject } from 'apollo-angular/types';
-import { ReplaySubject, catchError, map, throwError } from 'rxjs';
+import {
+  ReplaySubject,
+  catchError,
+  distinctUntilChanged,
+  map,
+  throwError,
+} from 'rxjs';
 
 export interface IGitHubRateLimit {
   remaining: number;
@@ -203,6 +209,15 @@ export class GithubService {
     return this._getPullRequestsQuery().valueChanges.pipe(
       catchError(this._handleError),
       map((result) => result.data?.search.nodes || []),
+      distinctUntilChanged(),
+      map((pullRequests) => {
+        const sortedPullRequests = [...pullRequests];
+        sortedPullRequests.sort(
+          (a, b) =>
+            new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+        );
+        return sortedPullRequests;
+      }),
     );
   }
 
@@ -226,9 +241,9 @@ export class GithubService {
         notifyOnNetworkStatusChange: true,
         pollInterval: 1000 * 60,
         variables: {
-          query: `org:UiPath is:pr is:open review-requested:@me`,
+          // query: `org:UiPath is:pr is:open review-requested:@me`,
+          query: `repo:UiPath/DU-App is:pr is:open review-requested:@me`,
           // query: `repo:UiPath/apollo-design-system is:pr is:open review-requested:@me`,
-          // query: `repo:UiPath/DU-App is:pr is:open review-requested:@me`,
           // query: `repo:UiPath/DU-App is:pr is:open author:@me`,
         },
       });
