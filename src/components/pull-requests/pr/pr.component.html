@@ -31,11 +31,11 @@
         />
         <div class="subtitle-group">
           <div class="mat-subtitle-1 subtitle">
-            Opened: {{ pr().createdAt | timeAgo: false }} by
+            Opened: <b>{{ pr().createdAt | timeAgo: false | async }}</b> by
             {{ pr().author.login }}
           </div>
           <div class="mat-subtitle-1 subtitle">
-            Last updated: {{ pr().updatedAt | timeAgo: false }}
+            Last updated: <b>{{ pr().updatedAt | timeAgo: false | async }}</b>
           </div>
         </div>
 
@@ -49,8 +49,6 @@
             <span>{{ pr().totalCommentsCount }}</span>
           </div>
         }
-
-        <!-- <div>reviewDecision: {{ pr().reviewDecision }}</div> -->
       </div>
     </div>
   </mat-expansion-panel-header>
