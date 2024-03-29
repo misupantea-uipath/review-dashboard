@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { AfterViewInit, Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 import { ApolloError } from '@apollo/client/core';
 import { Apollo, QueryRef, gql } from 'apollo-angular';
 import { EmptyObject } from 'apollo-angular/types';
@@ -173,14 +174,10 @@ export class GithubService {
     EmptyObject
   >;
 
-  constructor(private _apolloClient: Apollo) {
-    if (!localStorage.getItem('pat')) {
-      const pat = this._promptPat();
-      pat && localStorage.setItem('pat', pat);
-
-      window.location.href = window.location.href;
-    }
-  }
+  constructor(
+    private _apolloClient: Apollo,
+    private _router: Router,
+  ) {}
 
   getRateLimit$() {
     return this._apolloClient
@@ -189,7 +186,7 @@ export class GithubService {
         fetchPolicy: 'cache-only',
       })
       .valueChanges.pipe(
-        catchError(this._handleError),
+        catchError((error) => this._handleError(error)),
         map((result) => result.data?.rateLimit || {}),
       );
   }
@@ -200,14 +197,14 @@ export class GithubService {
         query: currentUserQuery,
       })
       .valueChanges.pipe(
-        catchError(this._handleError),
+        catchError((error) => this._handleError(error)),
         map((result) => result.data?.viewer),
       );
   }
 
   getPullRequests$() {
     return this._getPullRequestsQuery().valueChanges.pipe(
-      catchError(this._handleError),
+      catchError((error) => this._handleError(error)),
       map((result) => result.data?.search.nodes || []),
       distinctUntilChanged(),
       map((pullRequests) => {
@@ -253,14 +250,6 @@ export class GithubService {
     return pullRequestsQuery;
   }
 
-  private _promptPat = (
-    message = 'Please enter your GitHub Personal Access Token (PAT)',
-  ) => {
-    let pat: string | null = null;
-    pat = prompt(message);
-    return pat;
-  };
-
   private _handleError(_error: ApolloError) {
     const graphQLErrors = _error.graphQLErrors;
     // TODO: Handle GraphQL errors for INSUFFICIENT_SCOPES
@@ -272,11 +261,10 @@ export class GithubService {
         // A client-side or network error occurred. Handle it accordingly.
         console.error('An error occurred:', networkError.error);
       } else if (networkError.status === 401) {
-        // When Unauthorized, remove PAT & reload.
-
-        // TODO: proper login guard
+        console.log('HEREE');
+        // When Unauthorized, remove PAT & redirect to login.
         localStorage.removeItem('pat');
-        window.location.href = window.location.href;
+        this._router.navigate(['/login']);
       } else {
         // The backend returned an unsuccessful response code.
         // The response body may contain clues as to what went wrong.

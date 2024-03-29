@@ -4,6 +4,7 @@
   --transition-duration: 225ms;
   --transition-function: cubic-bezier(0.4, 0, 0.2, 1);
 
+  --accent-color: #69f0ae;
   --link-color: #7fb2fb;
 }
 
@@ -13,4 +14,22 @@ body {
 }
 body {
   margin: 0;
+}
+
+.accent {
+  color: var(--accent-color);
+}
+
+a {
+  color: var(--mat-app-text-color);
+  text-decoration-color: transparent;
+
+  transition-property: color, text-decoration-color;
+  transition-duration: var(--transition-duration);
+  transition-timing-function: var(--transition-function);
+
+  &:hover {
+    color: var(--link-color);
+    text-decoration-color: var(--link-color);
+  }
 }

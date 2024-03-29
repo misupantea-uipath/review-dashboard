@@ -67,20 +67,6 @@
   .title {
     margin: 0;
     margin: 0.25rem 0;
-
-    a {
-      color: var(--mat-app-text-color);
-      text-decoration-color: transparent;
-
-      transition-property: color, text-decoration-color;
-      transition-duration: var(--transition-duration);
-      transition-timing-function: var(--transition-function);
-
-      &:hover {
-        text-decoration-color: var(--link-color);
-        color: var(--link-color);
-      }
-    }
   }
 
   .subtitle-wrapper {
@@ -115,12 +101,4 @@
 
 .card-content {
   padding-top: 1rem;
-
-  a {
-    color: var(--mat-app-text-color);
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
 }
