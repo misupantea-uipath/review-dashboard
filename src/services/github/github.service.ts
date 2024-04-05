@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { AfterViewInit, Injectable } from '@angular/core';
+import { AfterViewInit, Injectable, computed, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApolloError } from '@apollo/client/core';
 import { Apollo, QueryRef, gql } from 'apollo-angular';
@@ -11,6 +11,7 @@ import {
   map,
   throwError,
 } from 'rxjs';
+import { FiltersService } from '../filters/filters.service';
 
 export interface IGitHubRateLimit {
   remaining: number;
@@ -174,10 +175,23 @@ export class GithubService {
     EmptyObject
   >;
 
+  private readonly _repositoriesFilterQuery = computed(() =>
+    this._filtersService
+      .getRepositories()()
+      .map((repo) => `repo:${repo}`)
+      .join(' '),
+  );
+
   constructor(
-    private _apolloClient: Apollo,
-    private _router: Router,
-  ) {}
+    private readonly _apolloClient: Apollo,
+    private readonly _router: Router,
+    private readonly _filtersService: FiltersService,
+  ) {
+    effect(() => {
+      const queryVariables = this._getPullRequestsQueryVariables();
+      this._getPullRequestsQuery().setVariables(queryVariables);
+    });
+  }
 
   getRateLimit$() {
     return this._apolloClient
@@ -205,7 +219,7 @@ export class GithubService {
   getPullRequests$() {
     return this._getPullRequestsQuery().valueChanges.pipe(
       catchError((error) => this._handleError(error)),
-      map((result) => result.data?.search.nodes || []),
+      map((result) => result.data?.search?.nodes || []),
       distinctUntilChanged(),
       map((pullRequests) => {
         const sortedPullRequests = [...pullRequests];
@@ -228,6 +242,12 @@ export class GithubService {
     this._getPullRequestsQuery().refetch();
   }
 
+  private _getPullRequestsQueryVariables() {
+    return {
+      query: `is:pr is:open ${this._repositoriesFilterQuery()} review-requested:@me`,
+    };
+  }
+
   private _getPullRequestsQuery() {
     const pullRequestsQuery =
       this._pullRequestsQuery ||
@@ -237,12 +257,7 @@ export class GithubService {
         query: getIssuesForRepoQuery,
         notifyOnNetworkStatusChange: true,
         pollInterval: 1000 * 60,
-        variables: {
-          // query: `org:UiPath is:pr is:open review-requested:@me`,
-          query: `repo:UiPath/DU-App is:pr is:open review-requested:@me`,
-          // query: `repo:UiPath/apollo-design-system is:pr is:open review-requested:@me`,
-          // query: `repo:UiPath/DU-App is:pr is:open author:@me`,
-        },
+        variables: this._getPullRequestsQueryVariables(),
       });
 
     if (!this._pullRequestsQuery) this._pullRequestsQuery = pullRequestsQuery;

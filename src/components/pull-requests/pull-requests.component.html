@@ -8,5 +8,16 @@
         <app-pr [pr]="pr" />
       }
     </div>
+  } @else {
+    <div class="empty-list">
+      @if (isLoadingPullRequests$ | async) {
+        <mat-spinner color="accent" />
+      } @else {
+        <div class="mat-headline-4">
+          No PRs found!
+          <mat-icon>sentiment_very_satisfied</mat-icon>
+        </div>
+      }
+    </div>
   }
 </div>
