@@ -13,7 +13,7 @@
     <button
       mat-mini-fab
       aria-label="refresh pull requests"
-      class="refresh-button"
+      class="nav-button refresh-button"
       [class.is-loading]="vm.isLoadingPullRequests"
       [disabled]="vm.isLoadingPullRequests"
       [matTooltip]="vm.rateLimit.remaining + ' / ' + vm.rateLimit.limit"
@@ -24,9 +24,10 @@
 
     <button
       mat-mini-fab
-      color="alt"
-      aria-label="Adjust filters"
-      matTooltip="Adjust filters"
+      aria-label="Toggle filters"
+      matTooltip="Toggle filters"
+      class="nav-button"
+      [color]="areFiltersVisible() ? 'accent' : ''"
       (click)="onFiltersToggle.emit()"
     >
       <mat-icon>tune</mat-icon>

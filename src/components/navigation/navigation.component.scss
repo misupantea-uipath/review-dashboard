@@ -28,11 +28,13 @@
     margin: 0;
   }
 
-  .refresh-button {
+  .nav-button {
     transition-property: all;
     transition-duration: var(--transition-duration);
     transition-timing-function: var(--transition-function);
+  }
 
+  .refresh-button {
     &.is-loading {
       animation: rotate 1s var(--transition-function) infinite;
     }

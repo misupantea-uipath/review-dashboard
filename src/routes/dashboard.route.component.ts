@@ -11,6 +11,7 @@ import { FiltersComponent } from '../components/filters/filters.component';
   providers: [GithubService],
   template: `
     <app-navigation
+      [areFiltersVisible]="areFiltersVisible()"
       (onFiltersToggle)="areFiltersVisible.set(!areFiltersVisible())"
     />
     @if (areFiltersVisible()) {

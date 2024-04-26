@@ -1,8 +1,13 @@
 import { Injectable, effect, signal } from '@angular/core';
 
+interface RepositoryFilter {
+  name: string;
+  isActive: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class FiltersService {
-  private readonly _repositories = signal<string[]>([]);
+  private readonly _repositories = signal<RepositoryFilter[]>([]);
 
   constructor() {
     this._hydratePersistedRepositories();
@@ -19,19 +24,30 @@ export class FiltersService {
     return this._repositories.asReadonly();
   }
 
-  setRepositories(repositories: string[]) {
-    this._repositories.set(repositories);
+  addRepository(repositoryName: string) {
+    if (this._includesRepository(repositoryName)) return;
+
+    this._repositories.set([
+      ...this._repositories(),
+      { name: repositoryName, isActive: true },
+    ]);
   }
 
-  addRepository(repository: string) {
-    if (this._repositories().includes(repository)) return;
-    this._repositories.set([...this._repositories(), repository]);
-  }
+  toggleRepository({ name }: RepositoryFilter) {
+    if (!this._includesRepository(name)) return;
 
-  removeRepository(repository: string) {
-    if (!this._repositories().includes(repository)) return;
     this._repositories.set(
-      this._repositories().filter((repo) => repo !== repository),
+      this._repositories().map((repo) =>
+        name === repo.name ? { ...repo, isActive: !repo.isActive } : repo,
+      ),
+    );
+  }
+
+  removeRepository({ name }: RepositoryFilter) {
+    if (!this._includesRepository(name)) return;
+
+    this._repositories.set(
+      this._repositories().filter((repo) => name !== repo.name),
     );
   }
 
@@ -41,7 +57,22 @@ export class FiltersService {
     );
 
     if (persistedRepositories) {
-      this._repositories.set(JSON.parse(persistedRepositories));
+      const rawPersistedRepos = JSON.parse(persistedRepositories);
+      const hydratedPersistedRepos = rawPersistedRepos.map(
+        (rawRepo: unknown) => {
+          if (typeof rawRepo === 'string') {
+            return { name: rawRepo, isActive: true };
+          } else return rawRepo;
+        },
+      );
+
+      this._repositories.set(hydratedPersistedRepos);
     }
+  }
+
+  private _includesRepository(repositoryName: string) {
+    return this._repositories()
+      .map(({ name }) => name)
+      .includes(repositoryName);
   }
 }

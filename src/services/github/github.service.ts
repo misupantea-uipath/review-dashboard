@@ -178,7 +178,8 @@ export class GithubService {
   private readonly _repositoriesFilterQuery = computed(() =>
     this._filtersService
       .getRepositories()()
-      .map((repo) => `repo:${repo}`)
+      .filter((repo) => repo.isActive)
+      .map((repo) => `repo:${repo.name}`)
       .join(' '),
   );
 

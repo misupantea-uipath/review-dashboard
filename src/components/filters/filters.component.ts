@@ -16,8 +16,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
         <mat-label>Repositories</mat-label>
         <mat-chip-grid #chipGrid aria-label="Search repository">
           @for (repo of repositories(); track repo) {
-            <mat-chip-row (removed)="removeRepository(repo)">
-              {{ repo }}
+            <mat-chip-row
+              color="accent"
+              [highlighted]="repo.isActive"
+              (removed)="removeRepository(repo)"
+              (click)="toggleRepository(repo)"
+            >
+              {{ repo.name }}
               <button matChipRemove [attr.aria-label]="'remove ' + repo">
                 <mat-icon>cancel</mat-icon>
               </button>
@@ -53,6 +58,9 @@ export class FiltersComponent {
   repositories = this._filtersService.getRepositories();
 
   removeRepository = this._filtersService.removeRepository.bind(
+    this._filtersService,
+  );
+  toggleRepository = this._filtersService.toggleRepository.bind(
     this._filtersService,
   );
 

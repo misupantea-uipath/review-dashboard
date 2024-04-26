@@ -1,4 +1,4 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, inject, input, output, signal } from '@angular/core';
 import { GithubService } from '../../services/github/github.service';
 import { CommonModule } from '@angular/common';
 import { LetDirective } from '@ngrx/component';
@@ -38,5 +38,6 @@ export class NavigationComponent {
     this._githubService,
   );
 
+  areFiltersVisible = input.required<boolean>();
   onFiltersToggle = output();
 }
