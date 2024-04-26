@@ -1,5 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Component, inject } from '@angular/core';
+import { Component, HostBinding, inject, signal } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipInputEvent, MatChipsModule } from '@angular/material/chips';
@@ -11,7 +11,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   selector: 'app-filters',
   standalone: true,
   template: `
-    <div class="filters">
+    <div class="filters-list">
       <mat-form-field class="repositories" color="accent">
         <mat-label>Repositories</mat-label>
         <mat-chip-grid #chipGrid aria-label="Search repository">
@@ -36,7 +36,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   `,
   styles: [
     `
-      .filters {
+      .filters-list {
         display: flex;
       }
       .repositories {
@@ -49,6 +49,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 export class FiltersComponent {
   private readonly _filtersService = inject(FiltersService);
   readonly separatorKeysCodes = [ENTER, COMMA];
+
   repositories = this._filtersService.getRepositories();
 
   removeRepository = this._filtersService.removeRepository.bind(

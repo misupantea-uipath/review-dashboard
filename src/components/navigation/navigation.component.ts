@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, output, signal } from '@angular/core';
 import { GithubService } from '../../services/github/github.service';
 import { CommonModule } from '@angular/common';
 import { LetDirective } from '@ngrx/component';
@@ -37,4 +37,6 @@ export class NavigationComponent {
   readonly refreshPullRequests = this._githubService.refreshPullRequests.bind(
     this._githubService,
   );
+
+  onFiltersToggle = output();
 }

@@ -12,7 +12,6 @@
 
     <button
       mat-mini-fab
-      color="accent"
       aria-label="refresh pull requests"
       class="refresh-button"
       [class.is-loading]="vm.isLoadingPullRequests"
@@ -21,6 +20,16 @@
       (click)="refreshPullRequests()"
     >
       <mat-icon>refresh</mat-icon>
+    </button>
+
+    <button
+      mat-mini-fab
+      color="alt"
+      aria-label="Adjust filters"
+      matTooltip="Adjust filters"
+      (click)="onFiltersToggle.emit()"
+    >
+      <mat-icon>tune</mat-icon>
     </button>
 
     <div class="current-user">
